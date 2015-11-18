@@ -3,6 +3,7 @@ package me.sheimi.sgit.repo.tasks.repo;
 import me.sheimi.sgit.database.models.Repo;
 import me.sheimi.sgit.exception.StopTaskException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.ArrayList;
