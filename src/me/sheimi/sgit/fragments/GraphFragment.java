@@ -84,21 +84,38 @@ public class GraphFragment extends RepoDetailFragment {
 
                 ArrayList<Entry> val = new ArrayList<Entry>();
 
-                int week=1;
+                int startYear=0;
+                int curYear=0;
+                int week=0;
                 int count=0;
                 for(int i=mResult.size()-1; i>=0; i--) {
                     Date d = mResult.get(i).getAuthorIdent().getWhen();
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(d);
 
+                    curYear = cal.get(Calendar.YEAR);
+                    int day = cal.get(Calendar.DAY_OF_YEAR);
                     int curWeek = cal.get(Calendar.WEEK_OF_YEAR);
+                    if(day > 365-7 && curWeek == 1) {
+                        curYear++;
+                    }
+                    if(day < 7 && curWeek == 5) {
+                        curYear--;
+                    }
+
+                    if(startYear == 0)
+                        startYear = curYear;
+
+                    curWeek += 52*(curYear-startYear);
 
                     if(week == curWeek) {
                         count++;
                     } else {
-                        val.add(new Entry(count, week));
+                        if(week >0) {
+                            val.add(new Entry(count, week));
+                        }
 
-                        for (int j=week+1; j<curWeek; j++)
+                        for (int j = week + 1; j < curWeek; j++)
                             val.add(new Entry(0, j));
 
                         week = curWeek;
@@ -107,10 +124,7 @@ public class GraphFragment extends RepoDetailFragment {
                 }
                 val.add(new Entry(count, week));
 
-                for (int j=week+1; j<=52; j++)
-                    val.add(new Entry(0, j));
-
-                LineDataSet setComp1 = new LineDataSet(val, "2015");
+                LineDataSet setComp1 = new LineDataSet(val, startYear + " - " + curYear);
                 setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
                 setComp1.setDrawCubic(true);
                 setComp1.setDrawCircles(false);
@@ -123,7 +137,8 @@ public class GraphFragment extends RepoDetailFragment {
 
                 ArrayList<String> xVals = new ArrayList<String>();
                 for(Entry e : val) {
-                    xVals.add("Week "+e.getXIndex());
+                    int id = e.getXIndex();
+                    xVals.add(id%52+1 +"/"+(startYear+(id/52)));
                 }
 
                 LineData data = new LineData(xVals, dataSets);
